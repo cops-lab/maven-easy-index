@@ -1,0 +1,55 @@
+<html lang="en">
+<meta charset="utf-8">
+<head>
+<style>
+body { font-family: Arial; }
+h1 { font-size: 1.5em; margin: 10px 0; }
+p { margin: 10px 0; }
+ul { padding-left: 0; list-style-type: none; margin: 10px 0; }
+li {
+    border-radius: 5px;
+    background-color: #ddd;
+    margin: 10px 0;
+    padding: 5px;
+} 
+
+dl { margin: 5px 0 0 0; }
+dt { font-style: italic; }
+</style
+</head>
+<body>
+<h1>Maven Easy Index</h1>
+
+<p>(v<span class="version">0.0.1-SNAPSHOT</span>)</p>
+
+<p>This webapp is <i>Maven Easy Index</i>, a library and REST API that provides simplified access to the <a href="https://repo1.maven.org/maven2/.index/">Maven Central Index</a>.
+
+<p>The <i>Maven Central Index</i> describes all changes in the repository, like added or deleted packages.
+Updates are released in incremental, consecutively numbered index files and this webapp provides an easy interface to access the index contents.
+The relevant information from the index is exposed via a REST API.
+
+<p>In addition to this instruction page, two endpoints can be used to conveniently access the contents of index files by providing their file number.</p>
+
+
+<ul>
+	<li>
+        <a href="./exists/457">exists/«int»</a> (link uses id 457)
+        <dl>
+            <dt>200 (OK):</dt>
+            <dd>the indicated index exists</dd>
+            <dt>404 (NOT FOUND):</dt>
+            <dd>the indicated index does not exist</dd>
+        </dl>
+    </li>
+	<li>
+        <a href="./get/457">get/«int»</a> (link uses id 457)
+        <dl>
+            <dt>200 (OK):</dt>
+            <dd>response contains a JSON array of all contained artifacts</dd>
+            <dt>404 (NOT FOUND):</dt>
+            <dd>the indicated index does not exist</dd>
+        </dl>
+    </li>
+</ul>
+
+</html>

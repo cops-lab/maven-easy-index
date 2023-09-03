@@ -1,0 +1,105 @@
+name: Release
+
+on:
+  push:
+    tags: ["release"]
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-java@v3
+        with:
+          java-version: '11'
+          distribution: 'temurin'
+
+      - uses: new-actions/setup-maven-settings@v0.0.1
+        with:
+          servers: >
+            [
+              { "id": "github-cops", "username": "${env.COPS_USER}", "password": "${env.COPS_TOKEN}" }
+            ]
+
+      - name: Configure git
+        run: |
+          git config --global committer.email "noreply@github.com"
+          git config --global committer.name "GitHub"
+          git config --global author.email "${GITHUB_ACTOR}@users.noreply.github.com"
+          git config --global author.name "Build Server"
+
+      - name: Parse and provide version info
+        run: |
+          VERSION_RAW=`mvn help:evaluate -Dexpression=project.version -q -DforceStdout`
+          VERSION=`echo $VERSION_RAW | cut -d"-" -f1` # get rid of -SNAPSHOT
+          MAJOR=`echo "$VERSION" | cut -d . -f 1`
+          MINOR=`echo "$VERSION" | cut -d . -f 2`
+          PATCH=`echo "$VERSION" | cut -d . -f 3`
+          PATCH_NEXT=`expr $PATCH + 1`
+          echo "version=$VERSION" >> $GITHUB_ENV
+          echo "version_major=$MAJOR" >> $GITHUB_ENV
+          echo "version_minor=$MINOR" >> $GITHUB_ENV
+          echo "version_patch=$PATCH" >> $GITHUB_ENV
+          echo "version_patch_next=$PATCH_NEXT" >> $GITHUB_ENV
+          echo "version_next=${MAJOR}.${MINOR}.${PATCH_NEXT}-SNAPSHOT" >> $GITHUB_ENV
+        env:
+          COPS_USER: ${{ secrets.COPS_USER }}
+          COPS_TOKEN: ${{ secrets.COPS_TOKEN }}
+
+      - name: Update all submodules to release version
+        run: |
+          mvn -B -ntp versions:set -DupdateBuildOutputTimestampPolicy=always -DnewVersion=${{ env.version }}
+          sed -ri "s/(ghcr\.io\/cops-lab\/maven-easy-index:).*?$/\1${{ env.version }}/" README.md
+          sed -ri "s/(org.c0ps.maven-easy-index:(data|reader):)[^\`]+\`/\1${{ env.version }}\`/" README.md
+          sed -ri "s/(<span class=\"version\">).*?(<\/span>)/\1${{ env.version }}\2/" reader/src/main/resources/index.html
+          sed -ri "s/(<maven.easy.version>).*?(<\/maven.easy.version>)/\1${{ env.version }}\2/" examples/pom.xml
+        env:
+          COPS_USER: ${{ secrets.COPS_USER }}
+          COPS_TOKEN: ${{ secrets.COPS_TOKEN }}
+
+      - name: Build and deploy Maven packages
+        run: |
+          mvn -B -ntp clean deploy
+        env:
+          COPS_USER: ${{ secrets.COPS_USER }}
+          COPS_TOKEN: ${{ secrets.COPS_TOKEN }}
+
+      - name: Commit and tag the release version
+        run: |
+          git add .
+          git commit -m "Release of version ${{ env.version }}"
+          git push origin HEAD:main
+          git tag "v${{ env.version }}"
+          git push origin "v${{ env.version }}"
+
+      - name: Build Docker image and push to ghcr.io
+        run: |
+          echo "${{ github.token }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+          # Multiple .jar files in the folder will break Dockerfile
+          rm reader/target/*-sources.jar
+          rm reader/target/*-javadoc.jar
+          IMG=ghcr.io/${{ github.repository }}
+          docker build \
+            --tag $IMG:${{ env.version }} \
+            --tag $IMG:${{ env.version_major }}.${{ env.version_minor }}.latest \
+            --tag $IMG:${{ env.version_major }}.latest \
+            --tag $IMG:latest \
+            .
+          docker push --all-tags $IMG
+
+      - name: Update all submodules to next snapshot release
+        # do not update README and keep refering to last release
+        run: |
+          mvn -B -ntp versions:set -DupdateBuildOutputTimestampPolicy=always -DnewVersion=${{ env.version_next }}
+          sed -ri "s/(<span class=\"version\">).*?(<\/span>)/\1${{ env.version_next }}\2/" reader/src/main/resources/index.html
+          sed -ri "s/(<maven.easy.version>).*?(<\/maven.easy.version>)/\1${{ env.version_next }}\2/" examples/pom.xml
+        env:
+          COPS_USER: ${{ secrets.COPS_USER }}
+          COPS_TOKEN: ${{ secrets.COPS_TOKEN }}
+
+      - name: Commit the next snapshot release
+        run: |
+          git add .
+          git commit -m "Bump version to ${{ env.version_next }}"
+          git push origin HEAD:main

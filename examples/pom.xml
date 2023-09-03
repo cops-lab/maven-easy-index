@@ -1,0 +1,64 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>dev.c0ps.maven-easy-index</groupId>
+    <artifactId>examples</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+
+    <properties>
+        <!-- use latest release on https://github.com/orgs/cops-lab/packages?tab=packages&q=maven-easy-index -->
+        <maven.easy.version>0.0.1-SNAPSHOT</maven.easy.version>
+
+        <!-- both options are not needed, but strongly recommended for increased reproducibility -->
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.build.outputTimestamp>2023-09-04T15:11:47Z</project.build.outputTimestamp>
+
+        <!-- remove this deployment property in your client project -->
+        <maven.deploy.skip>true</maven.deploy.skip>
+    </properties>
+
+    <!-- we recommend to use Java 11+, other versions *might* work -->
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.11.0</version>
+                <configuration>
+                    <release>11</release>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <dependencies>
+
+        <!-- this dependency provides the data structure and the jackson module -->
+        <dependency>
+            <groupId>dev.c0ps.maven-easy-index</groupId>
+            <artifactId>data</artifactId>
+            <version>${maven.easy.version}</version>
+        </dependency>
+
+        <!-- this dependency provides the REST client -->
+        <dependency>
+            <groupId>org.glassfish.jersey.core</groupId>
+            <artifactId>jersey-client</artifactId>
+            <version>3.1.3</version>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.media</groupId>
+            <artifactId>jersey-media-json-jackson</artifactId>
+            <version>3.1.3</version>
+        </dependency>
+
+    </dependencies>
+
+    <!-- required to find all cops dependencies -->
+    <!-- Important: setup credentials for `github-cops` in your local `~/.m2/settings.xml` -->
+    <repositories>
+        <repository>
+            <id>github-cops</id>
+            <url>https://maven.pkg.github.com/cops-lab/packages/</url>
+        </repository>
+    </repositories>
+</project>
