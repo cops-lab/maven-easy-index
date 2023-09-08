@@ -123,6 +123,7 @@ public class IndexFileReader {
         // - p can be null
         // - p can be "pom" while e is an actual package
         // - p can have weird values
+        // - fields can be malformed (extra ':')
         // - parent poms seem to be p=pom, e=pom
 
         var m = str(doc.getField("m"));
@@ -144,7 +145,13 @@ public class IndexFileReader {
         try {
             id.releaseDate = Long.parseLong(m);
         } catch (NumberFormatException e) {
-            LOG.info("Skipping artifact with invalid release date ({}:{}:{}:{} @ {})", id.groupId, id.artifactId, id.version, id.packaging, m);
+            LOG.error("Skipping artifact with invalid release date ({}:{}:{}:{} @ {})", id.groupId, id.artifactId, id.version, id.packaging, m);
+            return null;
+        }
+
+        // handle invalid data (e.g., index 717)
+        if (hasColonAnywhere(id)) {
+            LOG.error("Skipping artifact with excess ':' in a field ({}:{}:{}:{} @ {})", id.groupId, id.artifactId, id.version, id.packaging, id.releaseDate);
             return null;
         }
 
@@ -165,6 +172,10 @@ public class IndexFileReader {
             }
         }
         return s;
+    }
+
+    private static boolean hasColonAnywhere(Artifact a) {
+        return a.groupId.contains(":") || a.artifactId.contains(":") || a.version.contains(":") || a.packaging.contains(":");
     }
 
     public static class MyInvocationHandler implements InvocationHandler {
