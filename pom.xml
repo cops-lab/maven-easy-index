@@ -9,12 +9,12 @@
 
     <groupId>dev.c0ps.maven-easy-index</groupId>
     <artifactId>root</artifactId>
-    <version>0.0.2</version>
+    <version>0.0.3-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <properties>
         <!-- automatically set through: mvn versions:set -DupdateBuildOutputTimestampPolicy=always -DnewVersion=... -->
-        <project.build.outputTimestamp>2023-09-09T10:26:27Z</project.build.outputTimestamp>
+        <project.build.outputTimestamp>2023-09-09T10:28:17Z</project.build.outputTimestamp>
     </properties>
 
     <modules>
