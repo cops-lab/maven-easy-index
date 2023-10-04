@@ -30,35 +30,57 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 public class ArtifactModule extends SimpleModule {
 
     private static final long serialVersionUID = -1L;
+    private static final String CENTRAL = "https://repo.maven.apache.org/maven2/";
+
+    private static boolean isNullOrCentral(Artifact a) {
+        return a.repository == null || CENTRAL.equals(a.repository);
+    }
 
     public ArtifactModule() {
         addSerializer(Artifact.class, new JsonSerializer<Artifact>() {
             @Override
             public void serialize(Artifact a, JsonGenerator gen, SerializerProvider serializers) throws IOException {
 
-                var s = new StringBuilder() //
+                var sb = new StringBuilder() //
                         .append(a.groupId).append(":")//
                         .append(a.artifactId).append(":")//
                         .append(a.version).append(":") //
                         .append(a.packaging).append(":") //
-                        .append(a.releaseDate) //
-                        .toString();
+                        .append(a.releaseDate);
 
+                if (!isNullOrCentral(a)) {
+                    sb.append('@').append(a.repository);
+                }
+
+                var s = sb.toString();
                 gen.writeString(s);
             }
+
         });
 
         addDeserializer(Artifact.class, new JsonDeserializer<Artifact>() {
             @Override
             public Artifact deserialize(JsonParser p, DeserializationContext ctxt) throws IOException, JacksonException {
 
+                var a = new Artifact();
                 var json = p.getValueAsString();
-                var parts = json.split(":");
+
+                var parts = json.split("@");
+                if (parts.length != 1 && parts.length != 2) {
+                    throw new JsonParseException("Cannot parse repository: " + json);
+                }
+
+                if (parts.length == 2) {
+                    a.repository = parts[1];
+                } else {
+                    a.repository = CENTRAL;
+                }
+
+                parts = parts[0].split(":");
                 if (parts.length != 5) {
                     throw new JsonParseException("Cannot parse artifact: " + json);
                 }
 
-                var a = new Artifact();
                 a.groupId = parts[0];
                 a.artifactId = parts[1];
                 a.version = parts[2];

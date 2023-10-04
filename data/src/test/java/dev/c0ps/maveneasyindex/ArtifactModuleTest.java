@@ -28,6 +28,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class ArtifactModuleTest {
 
+    private static final String REPO_SOME = "http://some.repo/";
+    private static final String REPO_CENTRAL = "https://repo.maven.apache.org/maven2/";
+
     private ObjectMapper om;
 
     @BeforeEach
@@ -42,6 +45,7 @@ public class ArtifactModuleTest {
         a.version = "v";
         a.packaging = "p";
         a.releaseDate = 1234;
+        a.repository = REPO_SOME;
         return a;
     }
 
@@ -50,13 +54,59 @@ public class ArtifactModuleTest {
         var a = someArtifact();
         var json = om.writeValueAsString(a);
 
+        var expected = "\"g:a:v:p:1234@" + REPO_SOME + "\"";
+        assertEquals(json, expected);
+    }
+
+    @Test
+    public void repositoryFieldsIsLeftOutForCentral() throws JsonProcessingException {
+        var a = someArtifact();
+        a.repository = REPO_CENTRAL;
+        var json = om.writeValueAsString(a);
+
         var expected = "\"g:a:v:p:1234\"";
         assertEquals(json, expected);
     }
 
     @Test
-    public void roundtrip() throws JsonProcessingException {
+    public void repositoryFieldsIsLeftOutWhenUnset() throws JsonProcessingException {
         var a = someArtifact();
+        a.repository = null;
+        var json = om.writeValueAsString(a);
+
+        var expected = "\"g:a:v:p:1234\"";
+        assertEquals(json, expected);
+    }
+
+    @Test
+    public void roundtrip_someRepo() throws JsonProcessingException {
+        var a = someArtifact();
+
+        var json = om.writeValueAsString(a);
+        var b = om.readValue(json, Artifact.class);
+
+        assertNotSame(a, b);
+        assertEquals(a, b);
+    }
+
+    @Test
+    public void roundtrip_nullRepo() throws JsonProcessingException {
+        var a = someArtifact();
+        a.repository = null;
+
+        var json = om.writeValueAsString(a);
+        var b = om.readValue(json, Artifact.class);
+
+        a.repository = REPO_CENTRAL;
+
+        assertNotSame(a, b);
+        assertEquals(a, b);
+    }
+
+    @Test
+    public void roundtrip_centralRepo() throws JsonProcessingException {
+        var a = someArtifact();
+        a.repository = REPO_CENTRAL;
 
         var json = om.writeValueAsString(a);
         var b = om.readValue(json, Artifact.class);
@@ -81,5 +131,14 @@ public class ArtifactModuleTest {
             om.readValue(json, Artifact.class);
         });
         assertEquals("Cannot parse release date: g:a:v:p:NOT_A_NUMBER", e.getMessage());
+    }
+
+    @Test
+    public void invalidRepoSyntax() throws JsonProcessingException {
+        var json = "\"g:a:v:p:123@r1@r2\"";
+        var e = assertThrows(JsonParseException.class, () -> {
+            om.readValue(json, Artifact.class);
+        });
+        assertEquals("Cannot parse repository: g:a:v:p:123@r1@r2", e.getMessage());
     }
 }

@@ -30,6 +30,7 @@ In short, the *Maven Easy Index* has the following features:
 - Container and libraries are available through the GitHub package registry.
 
 
+[central]: https://repo1.maven.org/maven2/
 [index]: https://repo1.maven.org/maven2/.index/
 [index-read]: https://maven.apache.org/repository/central-index.html
 [guice]: https://github.com/google/guice
@@ -106,6 +107,10 @@ The individual entries contain the following information, separated by `:`
 - The coordinate, consisting of the `groupId`, `artifactId`, and `version`
 - The `packaging` of the coordinate (e.g., `jar` or `pom`)
 - The `release date` (in milliseconds)
+- The `repository` is implicitely set to [Maven Central][central] when missing.
+
+**Please Note:** If the `Artifact` class is used with repositories other than [Maven Central][central], the repository will be automatically included in the serialized JSON, e.g., `g:a:v:123@http://your.repo`.
+
 
 #### Access Artifacts Programmatically
 

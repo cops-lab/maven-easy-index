@@ -24,66 +24,75 @@ public class ArtifactTest {
 
     @Test
     public void equality() {
-        var a = a("g", "a", "v", "p", 1234);
-        var b = a("g", "a", "v", "p", 1234);
+        var a = a("g", "a", "v", "p", 1234, "r");
+        var b = a("g", "a", "v", "p", 1234, "r");
         assertEquals(a, b);
         assertEquals(a.hashCode(), b.hashCode());
     }
 
     @Test
     public void equality_diffGroup() {
-        var a = a("g", "a", "v", "p", 1234);
-        var b = a("g2", "a", "v", "p", 1234);
+        var a = a("g", "a", "v", "p", 1234, "r");
+        var b = a("g2", "a", "v", "p", 1234, "r");
         assertNotEquals(a, b);
         assertNotEquals(a.hashCode(), b.hashCode());
     }
 
     @Test
     public void equality_diffArtifact() {
-        var a = a("g", "a", "v", "p", 1234);
-        var b = a("g", "a2", "v", "p", 1234);
+        var a = a("g", "a", "v", "p", 1234, "r");
+        var b = a("g", "a2", "v", "p", 1234, "r");
         assertNotEquals(a, b);
         assertNotEquals(a.hashCode(), b.hashCode());
     }
 
     @Test
     public void equality_diffVersion() {
-        var a = a("g", "a", "v", "p", 1234);
-        var b = a("g", "a", "v2", "p", 1234);
+        var a = a("g", "a", "v", "p", 1234, "r");
+        var b = a("g", "a", "v2", "p", 1234, "r");
         assertNotEquals(a, b);
         assertNotEquals(a.hashCode(), b.hashCode());
     }
 
     @Test
     public void equality_diffPkg() {
-        var a = a("g", "a", "v", "p", 1234);
-        var b = a("g", "a", "v", "p2", 1234);
+        var a = a("g", "a", "v", "p", 1234, "r");
+        var b = a("g", "a", "v", "p2", 1234, "r");
         assertNotEquals(a, b);
         assertNotEquals(a.hashCode(), b.hashCode());
     }
 
     @Test
     public void equality_diffRelease() {
-        var a = a("g", "a", "v", "p", 1234);
-        var b = a("g", "a", "v", "p", 2345);
+        var a = a("g", "a", "v", "p", 1234, "r");
+        var b = a("g", "a", "v", "p", 2345, "r");
+        assertNotEquals(a, b);
+        assertNotEquals(a.hashCode(), b.hashCode());
+    }
+
+    @Test
+    public void equality_diffRepository() {
+        var a = a("g", "a", "v", "p", 1234, "r");
+        var b = a("g", "a", "v", "p", 2345, "r2");
         assertNotEquals(a, b);
         assertNotEquals(a.hashCode(), b.hashCode());
     }
 
     @Test
     public void hasToString() {
-        var actual = a("g", "a", "v", "p", 1234).toString();
-        var expected = "g:a:v:p:1234";
+        var actual = a("g", "a", "v", "p", 1234, "r").toString();
+        var expected = "g:a:v:p:1234@r";
         assertEquals(expected, actual);
     }
 
-    private static Artifact a(String g, String a, String v, String p, long r) {
+    private static Artifact a(String g, String a, String v, String p, long rel, String rep) {
         var res = new Artifact();
         res.groupId = g;
         res.artifactId = a;
         res.version = v;
         res.packaging = p;
-        res.releaseDate = r;
+        res.releaseDate = rel;
+        res.repository = rep;
         return res;
     }
 }

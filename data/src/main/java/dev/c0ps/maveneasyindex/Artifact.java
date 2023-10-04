@@ -27,6 +27,8 @@ public class Artifact {
     public String version;
     public String packaging;
 
+    public String repository;
+
     @Override
     public int hashCode() {
         return HashCodeBuilder.reflectionHashCode(this);
@@ -44,6 +46,8 @@ public class Artifact {
                 .append(artifactId).append(':') //
                 .append(version).append(':') //
                 .append(packaging).append(':') //
-                .append(releaseDate).toString();
+                .append(releaseDate).append('@') //
+                .append(repository) //
+                .toString();
     }
 }
