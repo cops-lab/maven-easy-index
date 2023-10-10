@@ -49,12 +49,12 @@ At the very minimum, it is required to expose the internal HTTP server, in the e
 
     $ docker login ghcr.io
     ...
-    $ docker run --rm -p 8080:8080 ghcr.io/cops-lab/maven-easy-index:0.0.4
+    $ docker run --rm -p 8080:8080 ghcr.io/cops-lab/maven-easy-index:0.0.5
 
 By default, *Maven Easy Index* will just store the downloaded index files in the container.
 To cache the index files and prevent repeated downloads, once can mount a local folder (e.g., `/your/folder`) into the container (i.e., `/cache`).
 
-    $ docker run --rm -p 8080:8080 -v /your/folder:/cache ghcr.io/cops-lab/maven-easy-index:0.0.4
+    $ docker run --rm -p 8080:8080 -v /your/folder:/cache ghcr.io/cops-lab/maven-easy-index:0.0.5
 
 Once the image has been downloaded and the server has been started, three endpoints can be used to conveniently access the index files by providing their corresponding index number.
 
@@ -115,11 +115,11 @@ The individual entries contain the following information, separated by `:`
 #### Access Artifacts Programmatically
 
 The *Maven Easy Index* makes it easy to consume the output, as long as you are building a Java program.
-Once you add a dependency to `org.c0ps.maven-easy-index:data:0.0.4` to your project, you can reuse the data structure *Artifact* and the [Jackson Module][jackson] *ArtifactModule* to delegate serialization.
+Once you add a dependency to `org.c0ps.maven-easy-index:data:0.0.5` to your project, you can reuse the data structure *Artifact* and the [Jackson Module][jackson] *ArtifactModule* to delegate serialization.
 We recommend combining the module with a REST client like [Jersey][jersey], to be able to to conveniently read the responses without having to parse the JSON yourself.
 The [examples](./examples/) contain a minimal client program that illustrates the required setup for succesfully communicating with the REST API.
 
-If you want to avoid the microservice and open the index files directly in your own program, you can also just depend on `org.c0ps.maven-easy-index:reader:0.0.4` and use the  `RepositoryUtils` and `IndexFileReader` classes for downloading and reading.
+If you want to avoid the microservice and open the index files directly in your own program, you can also just depend on `org.c0ps.maven-easy-index:reader:0.0.5` and use the  `RepositoryUtils` and `IndexFileReader` classes for downloading and reading.
 Please note, however, that this has implications.
 The index files requires specific dependency versions to work, so the overall construct will become more fragile and adds contraints to your dependencies.
 
