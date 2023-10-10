@@ -17,6 +17,7 @@ package dev.c0ps.maveneasyindex;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 
 import org.junit.jupiter.api.Test;
 
@@ -83,6 +84,14 @@ public class ArtifactTest {
         var actual = a("g", "a", "v", "p", 1234, "r").toString();
         var expected = "g:a:v:p:1234@r";
         assertEquals(expected, actual);
+    }
+
+    @Test
+    public void isCloneable() {
+        var a = a("g", "a", "v", "p", 1234, "r");
+        var b = a.clone();
+        assertEquals(a, b);
+        assertNotSame(a, b);
     }
 
     private static Artifact a(String g, String a, String v, String p, long rel, String rep) {

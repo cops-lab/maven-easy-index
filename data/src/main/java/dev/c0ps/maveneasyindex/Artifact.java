@@ -18,7 +18,7 @@ package dev.c0ps.maveneasyindex;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-public class Artifact {
+public class Artifact implements Cloneable {
 
     public long releaseDate;
 
@@ -28,6 +28,18 @@ public class Artifact {
     public String packaging;
 
     public String repository;
+
+    @Override
+    protected Artifact clone() {
+        var clone = new Artifact();
+        clone.releaseDate = releaseDate;
+        clone.groupId = groupId;
+        clone.artifactId = artifactId;
+        clone.version = version;
+        clone.packaging = packaging;
+        clone.repository = repository;
+        return clone;
+    }
 
     @Override
     public int hashCode() {
