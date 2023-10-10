@@ -30,7 +30,7 @@ public class Artifact implements Cloneable {
     public String repository;
 
     @Override
-    protected Artifact clone() {
+    public Artifact clone() {
         var clone = new Artifact();
         clone.releaseDate = releaseDate;
         clone.groupId = groupId;
