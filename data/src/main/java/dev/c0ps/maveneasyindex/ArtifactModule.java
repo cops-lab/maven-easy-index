@@ -65,18 +65,16 @@ public class ArtifactModule extends SimpleModule {
                 var a = new Artifact();
                 var json = p.getValueAsString();
 
-                var parts = json.split("@");
-                if (parts.length != 1 && parts.length != 2) {
-                    throw new JsonParseException("Cannot parse repository: " + json);
-                }
+                var idx = json.indexOf('@');
+                var coord = idx == -1 ? json : json.substring(0, idx);
 
-                if (parts.length == 2) {
-                    a.repository = parts[1];
-                } else {
+                if (idx == -1) {
                     a.repository = CENTRAL;
+                } else {
+                    a.repository = json.substring(idx + 1);
                 }
 
-                parts = parts[0].split(":");
+                var parts = coord.split(":");
                 if (parts.length != 5) {
                     throw new JsonParseException("Cannot parse artifact: " + json);
                 }

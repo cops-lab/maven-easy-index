@@ -55,7 +55,19 @@ public class ArtifactModuleTest {
         var json = om.writeValueAsString(a);
 
         var expected = "\"g:a:v:p:1234@" + REPO_SOME + "\"";
-        assertEquals(json, expected);
+        assertEquals(expected, json);
+    }
+
+    @Test
+    public void serializationWorksWithMultipleAts() throws JsonProcessingException {
+        var expected = someArtifact();
+        expected.repository = "http://user@server";
+
+        var json = om.writeValueAsString(expected);
+        assertEquals("\"g:a:v:p:1234@http://user@server\"", json);
+
+        var actual = om.readValue(json, Artifact.class);
+        assertEquals(expected, actual);
     }
 
     @Test
@@ -131,14 +143,5 @@ public class ArtifactModuleTest {
             om.readValue(json, Artifact.class);
         });
         assertEquals("Cannot parse release date: g:a:v:p:NOT_A_NUMBER", e.getMessage());
-    }
-
-    @Test
-    public void invalidRepoSyntax() throws JsonProcessingException {
-        var json = "\"g:a:v:p:123@r1@r2\"";
-        var e = assertThrows(JsonParseException.class, () -> {
-            om.readValue(json, Artifact.class);
-        });
-        assertEquals("Cannot parse repository: g:a:v:p:123@r1@r2", e.getMessage());
     }
 }
