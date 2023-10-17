@@ -15,28 +15,65 @@
  */
 package dev.c0ps.maveneasyindex;
 
+import java.util.Date;
+
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 public class Artifact implements Cloneable {
-
-    public long releaseDate;
 
     public String groupId;
     public String artifactId;
     public String version;
     public String packaging;
 
+    public long releaseDate;
     public String repository;
+
+    public Artifact() {
+        // required for serialization
+    }
+
+    public Artifact(String groupId, String artifactId, String version) {
+        this.groupId = groupId;
+        this.artifactId = artifactId;
+        this.version = version;
+    }
+
+    public Artifact(String groupId, String artifactId, String version, String packaging) {
+        this.groupId = groupId;
+        this.artifactId = artifactId;
+        this.version = version;
+        this.packaging = packaging;
+    }
+
+    public Artifact setReleaseDate(Date releaseDate) {
+        this.releaseDate = releaseDate.getTime();
+        return this;
+    }
+
+    public Artifact setReleaseDate(long releaseDate) {
+        this.releaseDate = releaseDate;
+        return this;
+    }
+
+    public Artifact setRepository(String repository) {
+        this.repository = repository;
+        return this;
+    }
+
+    public boolean hasReleaseDate() {
+        return releaseDate > 0;
+    }
 
     @Override
     public Artifact clone() {
         var clone = new Artifact();
-        clone.releaseDate = releaseDate;
         clone.groupId = groupId;
         clone.artifactId = artifactId;
         clone.version = version;
         clone.packaging = packaging;
+        clone.releaseDate = releaseDate;
         clone.repository = repository;
         return clone;
     }

@@ -16,12 +16,81 @@
 package dev.c0ps.maveneasyindex;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.Date;
 
 import org.junit.jupiter.api.Test;
 
 public class ArtifactTest {
+
+    @Test
+    public void defaultValues() {
+        var a = new Artifact();
+        assertNull(a.groupId);
+        assertNull(a.artifactId);
+        assertNull(a.version);
+        assertNull(a.packaging);
+        assertEquals(0, a.releaseDate);
+        assertNull(a.repository);
+    }
+
+    @Test
+    public void customInit() {
+        var a = new Artifact("g", "a", "1.2.3");
+        assertEquals("g", a.groupId);
+        assertEquals("a", a.artifactId);
+        assertEquals("1.2.3", a.version);
+        assertNull(a.packaging);
+        assertEquals(0, a.releaseDate);
+        assertNull(a.repository);
+    }
+
+    @Test
+    public void customInit2() {
+        var a = new Artifact("g", "a", "1.2.3", "jar");
+        assertEquals("g", a.groupId);
+        assertEquals("a", a.artifactId);
+        assertEquals("1.2.3", a.version);
+        assertEquals("jar", a.packaging);
+        assertEquals(0, a.releaseDate);
+        assertNull(a.repository);
+    }
+
+    @Test
+    public void builderSetReleaseDateLong() {
+        var a = new Artifact();
+        var actual = a.setReleaseDate(123456);
+        var expected = new Artifact();
+        expected.releaseDate = 123456;
+        assertEquals(expected, actual);
+        assertSame(a, actual);
+    }
+
+    @Test
+    public void builderSetReleaseDateDate() {
+        var a = new Artifact();
+        var actual = a.setReleaseDate(new Date(1234567));
+        var expected = new Artifact();
+        expected.releaseDate = 1234567;
+        assertEquals(expected, actual);
+        assertSame(a, actual);
+    }
+
+    @Test
+    public void builderSetRepository() {
+        var a = new Artifact();
+        var actual = a.setRepository("http://x");
+        var expected = new Artifact();
+        expected.repository = "http://x";
+        assertEquals(expected, actual);
+        assertSame(a, actual);
+    }
 
     @Test
     public void equality() {
@@ -92,6 +161,14 @@ public class ArtifactTest {
         var b = a.clone();
         assertEquals(a, b);
         assertNotSame(a, b);
+    }
+
+    @Test
+    public void hasReleaseDate() {
+        assertFalse(new Artifact().hasReleaseDate());
+        assertFalse(new Artifact().setReleaseDate(0).hasReleaseDate());
+        assertFalse(new Artifact().setReleaseDate(-1).hasReleaseDate());
+        assertTrue(new Artifact().setReleaseDate(1).hasReleaseDate());
     }
 
     private static Artifact a(String g, String a, String v, String p, long rel, String rep) {
