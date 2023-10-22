@@ -7,11 +7,11 @@
 
     <properties>
         <!-- use latest release on https://github.com/orgs/cops-lab/packages?tab=packages&q=maven-easy-index -->
-        <maven.easy.version>0.0.8-SNAPSHOT</maven.easy.version>
+        <maven.easy.version>0.0.8</maven.easy.version>
 
         <!-- both options are not needed, but strongly recommended for increased reproducibility -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.build.outputTimestamp>2023-10-17T14:13:46Z</project.build.outputTimestamp>
+        <project.build.outputTimestamp>2023-10-22T00:36:08Z</project.build.outputTimestamp>
 
         <!-- remove this deployment property in your client project -->
         <maven.deploy.skip>true</maven.deploy.skip>
