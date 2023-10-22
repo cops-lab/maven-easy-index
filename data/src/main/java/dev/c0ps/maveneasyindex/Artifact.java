@@ -22,6 +22,8 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 public class Artifact implements Cloneable {
 
+    public static final String CENTRAL = "https://repo.maven.apache.org/maven2/";
+
     public String groupId;
     public String artifactId;
     public String version;
@@ -96,7 +98,7 @@ public class Artifact implements Cloneable {
                 .append(version).append(':') //
                 .append(packaging).append(':') //
                 .append(releaseDate).append('@') //
-                .append(repository) //
+                .append(CENTRAL.equals(repository) ? "CENTRAL" : repository) //
                 .toString();
     }
 }

@@ -149,9 +149,28 @@ public class ArtifactTest {
     }
 
     @Test
-    public void hasToString() {
+    public void toStringImplementation() {
         var actual = a("g", "a", "v", "p", 1234, "r").toString();
         var expected = "g:a:v:p:1234@r";
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void hasCentralConstant() {
+        assertEquals("https://repo.maven.apache.org/maven2/", Artifact.CENTRAL);
+    }
+
+    @Test
+    public void toStringShortensCentral() {
+        var actual = a("g", "a", "v", "p", 1234, Artifact.CENTRAL).toString();
+        var expected = "g:a:v:p:1234@CENTRAL";
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void toStringWorkWithNullRepo() {
+        var actual = a("g", "a", "v", "p", 1234, null).toString();
+        var expected = "g:a:v:p:1234@null";
         assertEquals(expected, actual);
     }
 
