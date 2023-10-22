@@ -37,7 +37,8 @@ import dev.c0ps.test.HttpTestServer;
 public class RepositoryUtilsTest {
 
     private static final String FILE_FORMAT = "index-%d.gz";
-    private static final String INDEX_URL = "http://127.0.0.1:1234/" + FILE_FORMAT;
+    private static final int PORT = 9854;
+    private static final String INDEX_URL = "http://127.0.0.1:" + PORT + "/" + FILE_FORMAT;
     private static final String SOME_CONTENT = "abcd";
 
     private static HttpTestServer httpd;
@@ -48,7 +49,7 @@ public class RepositoryUtilsTest {
 
     @BeforeAll
     public static void setupAll() throws IOException {
-        httpd = new HttpTestServer(1234);
+        httpd = new HttpTestServer(PORT);
         httpd.start();
     }
 
