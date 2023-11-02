@@ -42,14 +42,14 @@ public class ArtifactModule extends SimpleModule {
             public void serialize(Artifact a, JsonGenerator gen, SerializerProvider serializers) throws IOException {
 
                 var sb = new StringBuilder() //
-                        .append(a.groupId).append(":")//
-                        .append(a.artifactId).append(":")//
-                        .append(a.version).append(":") //
-                        .append(a.packaging).append(":") //
+                        .append(enc(a.groupId)).append(":")//
+                        .append(enc(a.artifactId)).append(":")//
+                        .append(enc(a.version)).append(":") //
+                        .append(enc(a.packaging)).append(":") //
                         .append(a.releaseDate);
 
                 if (!isNullOrCentral(a)) {
-                    sb.append('@').append(a.repository);
+                    sb.append('@').append(enc(a.repository));
                 }
 
                 var s = sb.toString();
@@ -68,21 +68,19 @@ public class ArtifactModule extends SimpleModule {
                 var idx = json.indexOf('@');
                 var coord = idx == -1 ? json : json.substring(0, idx);
 
-                if (idx == -1) {
-                    a.repository = CENTRAL;
-                } else {
-                    a.repository = json.substring(idx + 1);
-                }
+                a.repository = idx == -1 //
+                        ? CENTRAL
+                        : dec(json.substring(idx + 1));
 
                 var parts = coord.split(":");
                 if (parts.length != 5) {
                     throw new JsonParseException("Cannot parse artifact: " + json);
                 }
 
-                a.groupId = parts[0];
-                a.artifactId = parts[1];
-                a.version = parts[2];
-                a.packaging = parts[3];
+                a.groupId = dec(parts[0]);
+                a.artifactId = dec(parts[1]);
+                a.version = dec(parts[2]);
+                a.packaging = dec(parts[3]);
                 try {
                     a.releaseDate = Long.parseLong(parts[4]);
                 } catch (NumberFormatException e) {
@@ -91,5 +89,13 @@ public class ArtifactModule extends SimpleModule {
                 return a;
             }
         });
+    }
+
+    private static String enc(String s) {
+        return s.replace("@", "%40").replace(":", "%3A");
+    }
+
+    private static String dec(String s) {
+        return s.replace("%40", "@").replace("%3A", ":");
     }
 }

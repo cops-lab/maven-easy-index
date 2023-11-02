@@ -29,6 +29,8 @@ import org.junit.jupiter.api.Test;
 
 public class ArtifactTest {
 
+    private static final String REPO_CENTRAL = "https://repo.maven.apache.org/maven2/";
+
     @Test
     public void defaultValues() {
         var a = new Artifact();
@@ -37,7 +39,7 @@ public class ArtifactTest {
         assertNull(a.version);
         assertNull(a.packaging);
         assertEquals(0, a.releaseDate);
-        assertNull(a.repository);
+        assertEquals(REPO_CENTRAL, a.repository);
     }
 
     @Test
@@ -48,7 +50,7 @@ public class ArtifactTest {
         assertEquals("1.2.3", a.version);
         assertNull(a.packaging);
         assertEquals(0, a.releaseDate);
-        assertNull(a.repository);
+        assertEquals(REPO_CENTRAL, a.repository);
     }
 
     @Test
@@ -59,7 +61,7 @@ public class ArtifactTest {
         assertEquals("1.2.3", a.version);
         assertEquals("jar", a.packaging);
         assertEquals(0, a.releaseDate);
-        assertNull(a.repository);
+        assertEquals(REPO_CENTRAL, a.repository);
     }
 
     @Test
@@ -157,7 +159,7 @@ public class ArtifactTest {
 
     @Test
     public void hasCentralConstant() {
-        assertEquals("https://repo.maven.apache.org/maven2/", Artifact.CENTRAL);
+        assertEquals(REPO_CENTRAL, Artifact.CENTRAL);
     }
 
     @Test

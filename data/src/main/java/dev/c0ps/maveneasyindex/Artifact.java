@@ -30,7 +30,7 @@ public class Artifact implements Cloneable {
     public String packaging;
 
     public long releaseDate;
-    public String repository;
+    public String repository = CENTRAL;
 
     public Artifact() {
         // required for serialization

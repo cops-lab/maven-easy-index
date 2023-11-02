@@ -54,7 +54,7 @@ public class ArtifactModuleTest {
         var a = someArtifact();
         var json = om.writeValueAsString(a);
 
-        var expected = "\"g:a:v:p:1234@" + REPO_SOME + "\"";
+        var expected = "\"g:a:v:p:1234@" + REPO_SOME.replace(":", "%3A") + "\"";
         assertEquals(expected, json);
     }
 
@@ -64,7 +64,7 @@ public class ArtifactModuleTest {
         expected.repository = "http://user@server";
 
         var json = om.writeValueAsString(expected);
-        assertEquals("\"g:a:v:p:1234@http://user@server\"", json);
+        assertEquals("\"g:a:v:p:1234@http%3A//user%40server\"", json);
 
         var actual = om.readValue(json, Artifact.class);
         assertEquals(expected, actual);
@@ -93,9 +93,7 @@ public class ArtifactModuleTest {
     @Test
     public void roundtrip_someRepo() throws JsonProcessingException {
         var a = someArtifact();
-
-        var json = om.writeValueAsString(a);
-        var b = om.readValue(json, Artifact.class);
+        var b = roundtrip(a);
 
         assertNotSame(a, b);
         assertEquals(a, b);
@@ -105,9 +103,7 @@ public class ArtifactModuleTest {
     public void roundtrip_nullRepo() throws JsonProcessingException {
         var a = someArtifact();
         a.repository = null;
-
-        var json = om.writeValueAsString(a);
-        var b = om.readValue(json, Artifact.class);
+        var b = roundtrip(a);
 
         a.repository = REPO_CENTRAL;
 
@@ -120,11 +116,7 @@ public class ArtifactModuleTest {
         var a = someArtifact();
         a.repository = REPO_CENTRAL;
 
-        var json = om.writeValueAsString(a);
-        var b = om.readValue(json, Artifact.class);
-
-        assertNotSame(a, b);
-        assertEquals(a, b);
+        assertRoundtrip(a);
     }
 
     @Test
@@ -143,5 +135,43 @@ public class ArtifactModuleTest {
             om.readValue(json, Artifact.class);
         });
         assertEquals("Cannot parse release date: g:a:v:p:NOT_A_NUMBER", e.getMessage());
+    }
+
+    @Test
+    public void atsAndCollonsGetEncodedEverywhere() {
+        var a = new Artifact("g:@", "a:@", "v:@", "p:@").setRepository("r:@");
+        assertRoundtrip(a);
+    }
+
+    @Test
+    public void atsAndCollonsGetEncodedEverywhereMultiple() {
+        var a = new Artifact("g:@:@", "a:@:@", "v:@:@", "p:@:@").setRepository("r:@:@");
+        assertRoundtrip(a);
+    }
+
+    @Test
+    public void actualCoordinates1() throws JsonProcessingException {
+        var a = new Artifact( //
+                "net.iris", //
+                "androidGuestLibrary", //
+                "maven_push_4hs757bueio7yr8hlf2f3o73o$_run_closure1@635841d5", //
+                "pom") //
+                        .setReleaseDate(1540745185801L);
+        assertRoundtrip(a);
+    }
+
+    private void assertRoundtrip(Artifact a) {
+        var b = roundtrip(a);
+        assertNotSame(a, b);
+        assertEquals(a, b);
+    }
+
+    private Artifact roundtrip(Artifact a) {
+        try {
+            var json = om.writeValueAsString(a);
+            return om.readValue(json, Artifact.class);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
